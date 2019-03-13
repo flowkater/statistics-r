@@ -124,20 +124,6 @@ titanicOlder <- subset(titanic, titanic$Age > 40, select = c("Survived", "Pclass
 
 mean(titanicOlder$Survived)
 
-# matrix -> Just Numerical
-titanicMatrix <- as.matrix(titanic[, c("Survived", "Pclass", "Age")])
-titanicMatrix
-
-
-
-##### Data Format
-
-
-
-
-
-
-
 
 
 
