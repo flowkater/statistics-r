@@ -4,11 +4,14 @@
 ## Script 여러개일 때 이전 Script 고르기: Ctrl + Shift + Tab
 ## Console 클리닝: Ctrl + L
 ## 메모리상의 모든 변수 및 데이터 삭제: rm(list = ls())
-## Mac for Korean: Sys.setlocale(locale = "ko_KR.utf8")
+## Mac for Korean / Mac 에서 한글 깨질때,
+# Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
+# theme_set(theme_gray(base_family="AppleGothic"))
+# par(family = "AppleGothic")
 ## R version check: Sys.getenv("R_ARCH") - 32 bit인 분은 R을 다시 인스톨해주시기 바랍니다
 ## 64 bit for "/x64"
 ## 32 bit for "/i386"
-## 각 라인마다 Ctrl + Enter
+## 각 라인마다 Ctrl(Cmd) + Enter
 
 
 #######################################################
