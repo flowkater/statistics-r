@@ -1,10 +1,12 @@
 install.packages("ggplot2")
+install.packages("Hmisc")
 install.packages("extrafont")
 install.packages("reshape")
 
 library(ggplot2)
 library(extrafont)
 library(reshape)
+library(Hmisc)
 
 # Mac 에서 한글 깨질때,
 Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
