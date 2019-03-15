@@ -15,9 +15,9 @@
 
 
 #######################################################
-####### Section 0. R 적응하기 - 기초 예제 실습 ########
+####### Section 1. R 적응하기 - 기초 예제 실습 ########
 
-setwd("~/work/statistics-R/")
+# setwd("~/work/statistics-R/")
 
 racers <- c("Alonso", "Schumacher", "Hamilton", "Vettel", "Ricciardo")
 

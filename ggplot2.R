@@ -12,13 +12,10 @@
 ## R version check: Sys.getenv("R_ARCH") - 32 bit인 분은 R을 다시 인스톨해주시기 바랍니다
 ## 64 bit for "/x64"
 ## 32 bit for "/i386"
-## 각 라인마다 Ctrl(Cmd) + Enter
+## 각 라인마다 실행 Ctrl(Cmd) + Enter
 
-
-install.packages("ggplot2")
-install.packages("Hmisc")
-install.packages("extrafont")
-install.packages("reshape")
+#######################################################
+####### Section 2. ggplot2 시각화 예제 따라쳐보기 ########
 
 library(ggplot2)
 library(extrafont)
