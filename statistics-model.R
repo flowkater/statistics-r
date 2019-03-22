@@ -16,19 +16,19 @@
 
 #######################################################
 ####### Section 0. 통계 모형, 설명 따라가보기 ########
-install.packages("ggplot2")
-install.packages("gridExtra")
-install.packages("Hmisc")
-install.packages("extrafont")
-install.packages("reshape")
-install.packages("dplyr")
+# install.packages("ggplot2")
+# install.packages("gridExtra")
+# install.packages("Hmisc")
+# install.packages("extrafont")
+# install.packages("reshape")
+# install.packages("dplyr")
 # install.packages("truncnorm")
 
 library(ggplot2)
 library(gridExtra)
 # library(truncnorm)
 
-# setwd("~/work/statistics-R/")
+setwd("~/work/statistics-R/")
 
 ### 도수 분포 (frequency distribution; 빈도 분포) / 히스토그램(histogram)
 StudyTime <- read.csv("./data/study_time.csv", header = TRUE)
@@ -36,9 +36,7 @@ View(StudyTime)
 histogram <- ggplot(StudyTime, aes(done_second))
 histogram + geom_histogram(
                  binwidth = 1000,
-                 colour="black", fill="blue", alpha = 0.5) + 
-  geom_density(alpha=.2, fill="#6666FF") #+
-  # geom_vline(xintercept = mean(StudyTime$done_second), colour = "Red")
+                 colour="black", fill="blue", alpha = 0.5) 
 
 
 ggplot(data = data.frame(x = rnorm(100, 50, 25)), aes(x)) +
@@ -153,7 +151,7 @@ sd(test_score_mean_sd)
 
 plot(test_score_mean_sd, same_index, col = "blue", cex = 5, pch = 19)
 
-## 수능 수능 수리가형 점수
+## 수능 수리가형 점수
 ## 2011년 불수능 평균 = 47.8, 표준편차 = 19.7
 ## 2015년 물수능 평균 = 55.4, 표준편차 = 28.5
 ## 80 점을 받은 A 학생, 100점을 B 학생 승자는?
@@ -181,6 +179,7 @@ user_ids <- c(1, 2, 3, 4, 5)
 friends <- c(1, 2, 3, 3, 4)
 
 snsData <- data.frame(Id = user_ids, FriendNumber = friends) 
+View(snsData)
 mean(snsData$FriendNumber)
 
 deviance <- ggplot(snsData, aes(snsData$Id, snsData$FriendNumber))
