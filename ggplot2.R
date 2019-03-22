@@ -22,7 +22,7 @@ library(extrafont)
 library(reshape)
 library(Hmisc)
 
-
+setwd("~/work/statistics-R/")
 
 ######################################################
 ### facebookData.csv

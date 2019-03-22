@@ -5,9 +5,9 @@
 ## Console 클리닝: Ctrl + L
 ## 메모리상의 모든 변수 및 데이터 삭제: rm(list = ls())
 ## Mac for Korean / Mac 에서 한글 깨질때,
-# Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
-# theme_set(theme_gray(base_family="AppleGothic"))
-# par(family = "AppleGothic")
+Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
+theme_set(theme_gray(base_family="AppleGothic"))
+par(family = "AppleGothic")
 ## R version check: Sys.getenv("R_ARCH") - 32 bit인 분은 R을 다시 인스톨해주시기 바랍니다
 ## 64 bit for "/x64"
 ## 32 bit for "/i386"
@@ -26,9 +26,9 @@ install.packages("dplyr")
 
 library(ggplot2)
 library(gridExtra)
-# library(truncnorm)
+library(truncnorm)
 
-# setwd("~/work/statistics-R/")
+setwd("~/work/statistics-R/")
 
 ### 도수 분포 (frequency distribution; 빈도 분포) / 히스토그램(histogram)
 StudyTime <- read.csv("./data/study_time.csv", header = TRUE)
@@ -231,14 +231,14 @@ grid.arrange(deviance2, deviance3, nrow=1, ncol=2)
 # 분산에 따른 정규분포도
 p1 <- ggplot(data = data.frame(x = c(0, 100)), aes(x)) +
   stat_function(fun = dnorm, n = 100, args = list(mean = 50, sd = 35)) +
-  labs(y = "", title = "sd: 35") +
-  coord_cartesian(ylim=c(0, 0.03))
+  labs(y = "", title = "평균은 같고 표준편차가 다를때") +
+  stat_function(fun = dnorm, n = 100, args = list(mean = 50, sd = 15))
 
 
 p2 <- ggplot(data = data.frame(x = c(0, 100)), aes(x)) +
-  stat_function(fun = dnorm, n = 100, args = list(mean = 50, sd = 15)) +
-  labs(y = "", title = "sd: 15") +
-  coord_cartesian(ylim=c(0, 0.03))
+  stat_function(fun = dnorm, n = 100, args = list(mean = 50, sd = 25)) +
+  labs(y = "", title = "표준편차가 다르고 평균이 같을때") +
+  stat_function(fun = dnorm, n = 100, args = list(mean = 80, sd = 25))
 
 
 grid.arrange(p1, p2, nrow=1, ncol=2)
@@ -260,7 +260,8 @@ ggplot(data.frame(x=c(-3,3)), aes(x=x)) +
   stat_function(fun=dnorm_range, geom = "area", fill="grey", alpha = 0.5) +
   ggtitle("Normal Distribution")
 
-
-
+a <- c(1, 3, 4, 2, 5, 3, 3, 2)
+summary(a)
+boxplot(a)
 
 
