@@ -128,6 +128,8 @@ View(festivalOutlier)
 
 festivalData[611, ]$day1 <- 2.02
 
+# write.csv(festivalData, "./data/festivalDataNoOutlier.csv", row.names=FALSE)
+
 festivalBoxplot <- ggplot(festivalData, aes(gender, day1))
 festivalBoxplot + geom_boxplot() + labs(x = "성별", y = "축제 Day 1 위생")
 

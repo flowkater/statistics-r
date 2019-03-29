@@ -265,3 +265,69 @@ summary(a)
 boxplot(a)
 
 
+## Data conversion
+# df <- read.delim("./data/~.dat", header = TRUE)
+# View(df)
+# write.csv(df, "./data/~.csv", row.names = FALSE)
+
+# ma = 10
+# mb = 18
+# mmean = (ma + mb) / 2
+# 
+# brixton <- rtruncnorm(n = 10, a = ma, b = mb, mean = mmean , sd = 1.5 + runif(1, 0.01, 0.03))
+# brighton <- rtruncnorm(n = 10, a = ma + 5, b = mb + 5, mean = mmean + 5 , sd = 1.5 + runif(1, 0.01, 0.03))
+# bristol <- rtruncnorm(n = 10, a = ma + 8, b = mb + 8, mean = mmean + 8 , sd = 1.5 + runif(1, 0.01, 0.03))
+# edinburgh <- rtruncnorm(n = 10, a = ma + 12, b = mb + 12, mean = mmean + 12, sd = 1.5 + runif(1, 0.01, 0.03))
+# newcastie <- rtruncnorm(n = 10, a = ma + 18, b = mb + 18, mean = mmean + 18 , sd = 1.5 + runif(1, 0.01, 0.03))
+# cardiff <- rtruncnorm(n = 10, a = ma + 30, b = mb + 30, mean = mmean + 30 , sd = 1.5 + runif(1, 0.01, 0.03))
+# dubin <- rtruncnorm(n = 10, a = ma + 40, b = mb + 40, mean = mmean + 40 , sd = 1.5 + runif(1, 0.01, 0.03))
+# 
+# concert <- data.frame(BrixtonAcademy = brixton, Brighton = brighton, Bristol = bristol, Edinburgh = edinburgh, Newcastie = newcastie, Cardiff = cardiff, Dubin = dubin)
+# # View(concert)
+# 
+# 
+# conRing <- stack(concert)
+# names(conRing) <- c("Ringing", "Concert")
+# 
+# # View(conRing)
+# 
+# line.homo <- ggplot(conRing, aes(conRing$Concert, conRing$Ringing, group = 1)) + 
+#   geom_point() +
+#   stat_summary(fun.y = mean, geom = "point", shape = 3, size=5) +
+#   stat_summary(fun.y = mean, geom = "line", size = 1, colour = 'deeppink') +
+#   coord_cartesian(ylim=c(0, 70)) +
+#   labs(x = "Concert", y = "Ringing (Hours)")
+# 
+# line.homo
+# 
+# write.csv(concert, "./data/concert-homovar.csv", row.names = FALSE)
+# 
+# 
+# brixton <- rtruncnorm(n = 10, a = ma, b = mb, mean = mmean , sd = 1.5 + runif(1, 1, 10))
+# brighton <- rtruncnorm(n = 10, a = ma + 5, b = mb + 5, mean = mmean + 5 , sd = 1.5 + runif(1, 1, 10))
+# bristol <- rtruncnorm(n = 10, mean = mmean + 8 , sd = 1.5 + runif(1, 1, 10))
+# edinburgh <- rtruncnorm(n = 10, mean = mmean + 12, sd = 1.5 + runif(1, 1, 10))
+# newcastie <- rtruncnorm(n = 10, mean = mmean + 18 , sd = 1.5 + runif(1, 1, 10))
+# cardiff <- rtruncnorm(n = 10, mean = mmean + 30 , sd = 1.5 + runif(1, 1, 10))
+# dubin <- rtruncnorm(n = 10, a = ma + 40, b = mb + 40, mean = mmean + 40 , sd = 1.5 + runif(1, 1, 10))
+# 
+# concerth <- data.frame(BrixtonAcademy = brixton, Brighton = brighton, Bristol = bristol, Edinburgh = edinburgh, Newcastie = newcastie, Cardiff = cardiff, Dubin = dubin)
+# # View(concert)
+# 
+# 
+# conRingh <- stack(concerth)
+# names(conRingh) <- c("Ringing", "Concert")
+# 
+# # View(conRing)
+# 
+# line.hete <- ggplot(conRingh, aes(conRingh$Concert, conRingh$Ringing, group = 1)) + 
+#   geom_point() +
+#   stat_summary(fun.y = mean, geom = "point", shape = 3, size=5) +
+#   stat_summary(fun.y = mean, geom = "line", size = 1, colour = 'deeppink') +
+#   coord_cartesian(ylim=c(0, 70)) +
+#   labs(x = "Concert", y = "Ringing (Hours)")
+# 
+# line.hete
+# write.csv(concerth, "./data/concert-hetervar.csv", row.names = FALSE)
+# 
+# grid.arrange(line.homo, line.hete, nrow=1, ncol =2)
