@@ -4,6 +4,10 @@
 ## Script 여러개일 때 이전 Script 고르기: Ctrl + Shift + Tab
 ## Console 클리닝: Ctrl + L
 ## 메모리상의 모든 변수 및 데이터 삭제: rm(list = ls())
+## Mac for Korean / Mac 에서 한글 깨질때,
+Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
+theme_set(theme_gray(base_family="AppleGothic"))
+par(family = "AppleGothic")
 ## R version check: Sys.getenv("R_ARCH") - 32 bit인 분은 R을 다시 인스톨해주시기 바랍니다
 ## 64 bit for "/x64"
 ## 32 bit for "/i386"
@@ -16,7 +20,6 @@ install.packages("car")
 install.packages("pastecs")
 install.packages("psych")
 install.packages("SuppDists")
-install.packages("truncnorm")
 
 
 library(car)
@@ -27,12 +30,7 @@ library(gridExtra)
 library(truncnorm)
 library(SuppDists)
 
-## Mac for Korean / Mac 에서 한글 깨질때,
-# Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
-# theme_set(theme_gray(base_family="AppleGothic"))
-# par(family = "AppleGothic")
-# 
-# setwd("~/work/statistics-R/")
+setwd("~/work/statistics-R/")
 
 ######################################################
 ### festivalDataNoOutlier(이상치 제거 버전)
@@ -58,13 +56,38 @@ hist.day1 <- ggplot(dlf, aes(day1)) +
                             sd = sd(dlf$day1, na.rm = TRUE)), 
                 colour = "black", 
                 size = 1)
-hist.day1
 
 qqplot.day1 <- ggplot(dlf, aes(sample = dlf$day1)) + 
   stat_qq() + stat_qq_line(colour = "Red")
 qqplot.day1
 
 ## TODO: Day2, Day3 Histogram + Q-Q Plot 을 작성해보세요.
+
+hist.day2 <- ggplot(dlf, aes(day2)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "day 2 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$day2, na.rm = TRUE), 
+                            sd = sd(dlf$day2, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+qqplot.day2 <- ggplot(dlf, aes(sample = dlf$day2)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
+
+hist.day3 <- ggplot(dlf, aes(day3)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "day 3 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$day3, na.rm = TRUE), 
+                            sd = sd(dlf$day3, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+qqplot.day3 <- ggplot(dlf, aes(sample = dlf$day3)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
 
 ####
 
@@ -103,17 +126,62 @@ str(rexam)
 ### psych::stat.desc 를 이용하여 exam, computer, lectures, numeracy 에 대한 서술적 통계량들을 출력하시오. (round(, digits = 3) 를 쓰세요.)
 ### 비대칭도(skewness), 첨도(kurtosis), 앞서 배웠던 skew.2SE, kurt.2SE 를 이용하여 통계량을 해석해보아라
 
+stat.desc(rexam[, c("exam", "computer", "lectures", "numeracy")], basic = FALSE, norm = TRUE)
+round(stat.desc(rexam[, c("exam", "computer", "lectures", "numeracy")], basic = FALSE, norm = TRUE), digits = 3)
 
-### TODO: exam, computer, lecture, numeracy 에 대한 히스토그램을 출력하시오.
+### exam, computer, lecture, numeracy 에 대한 히스토그램을 출력하시오.
 #### y축은 밀도로 테두리는 검은색, 색깔은 흰색으로 채움
 #### 해당 데이터의 평균과 분산을 이용하여 정규분포 그래프 추가
 
+hist.exam <- ggplot(rexam, aes(exam)) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "R 시험 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(rexam$exam, na.rm = TRUE), 
+                            sd = sd(rexam$exam, na.rm = TRUE)), 
+                colour = "blue", 
+                size = 1)
+
+hist.computer <- ggplot(rexam, aes(computer)) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "컴퓨터 활용 능력 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(rexam$computer, na.rm = TRUE), 
+                            sd = sd(rexam$computer, na.rm = TRUE)), 
+                colour = "blue", 
+                size = 1) 
+
+hist.lectures <- ggplot(rexam, aes(lectures)) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "강의 출석률", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(rexam$lectures, na.rm = TRUE), 
+                            sd = sd(rexam$lectures, na.rm = TRUE)), 
+                colour = "blue", 
+                size = 1) 
+
+hist.numeracy <- ggplot(rexam, aes(numeracy)) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white", binwidth = 1) +
+  labs(x = "수치 해석 능력", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(rexam$numeracy, na.rm = TRUE), 
+                            sd = sd(rexam$numeracy, na.rm = TRUE)), 
+                colour = "blue", 
+                size = 1)
 
 ###
 grid.arrange(hist.exam, hist.computer, hist.lectures, hist.numeracy, nrow=2, ncol=2)
 
-### TODO: exam, computer, lecture, numeracy 에 대한 Q-Q plot을 출력하시오.
+### exam, computer, lecture, numeracy 에 대한 Q-Q plot을 출력하시오.
 
+qqplot.exam <- ggplot(rexam, aes(sample = rexam$exam)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
+qqplot.computer <- ggplot(rexam, aes(sample = rexam$computer)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
+qqplot.lectures <- ggplot(rexam, aes(sample = rexam$lectures)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
+qqplot.numeracy <- ggplot(rexam, aes(sample = rexam$numeracy)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
 
 
 ###
@@ -215,6 +283,21 @@ stat.desc(cbind(rexam$exam, nexam$x), basic = FALSE, norm = TRUE)
 ##### TODO: 기존 데이터의 numeracy (0~15)를 정규분포로 만들어서 histogram과 Q-Q plot 을 그려보아라.
 ##### TODO: 위 작업 후에 통계량을 출력해서 비교해보아라.
 
+norm_numeracy <- rtruncnorm(n = length(rexam$numeracy),a = 0, b = 15, mean = mean(rexam$numeracy), sd = sd(rexam$numeracy))
+
+nnumeracy <- data.frame(x = norm_numeracy)
+
+hist.norm_numeracy <- ggplot(nnumeracy, aes(x)) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white", binwidth = 1) +
+  labs(x = "numeracy", y = "밀도", title = "정규분포") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(nnumeracy$x, na.rm = TRUE), 
+                            sd = sd(nnumeracy$x, na.rm = TRUE)), 
+                colour = "blue", 
+                size = 1)
+
+qqplot.norm_numeracy <- ggplot(nnumeracy, aes(sample = nnumeracy$x)) + 
+  stat_qq() + stat_qq_line(colour = "Red")
 
 ####
 grid.arrange(hist.numeracy, hist.norm_numeracy, 
@@ -275,7 +358,13 @@ leveneTest(conRingh$Ringing, conRingh$Concert)
 
 ### TODO: rexam 의 exam, computer, lectures, numeracy 에 대해서도 레빈 검정을 해보아라. 
 ### 그리고 분산의 동질성을 유지하는 것과 동질성이 깨지는 것은 무엇인가?
+leveneTest(rexam$exam, rexam$uni)
+leveneTest(rexam$exam, rexam$uni, center = mean)
 
+leveneTest(rexam$computer, rexam$uni)
+leveneTest(rexam$lectures, rexam$uni)
+
+leveneTest(rexam$numeracy, rexam$uni)
 
 ### 하틀리 F_max 검정 (Hartley's F_max test)
 ### 
@@ -304,14 +393,12 @@ fmax_numeracy < qmaxFratio(0.95, 49, 2)
 
 1 - pmaxFratio(fmax_numeracy, 49, 2)
 
-#### qnorm
+#### Outlier
 
 qnorm(1 - (0.001 / 2))
 qnorm(1 - (0.05 / 2))
 qnorm(1 - (0.01 / 2))
-
-
-############# 표준정규분포 
+# 표준정규분포 
 
 dnorm_range999 <- function(x) {
   y <- dnorm(x) 
@@ -420,7 +507,38 @@ dlf$logday2 <- log(dlf$day2 + 1)
 dlf$logday2
 
 ### TODO: 3일차도 똑같이 로그변환을 적용하고 logday1, logday2, logday3 3일간 로그 변환된 위생 점수들로 히스토그램을 작성하라.
+dlf$logday3 <- log(dlf$day3 + 1)
+dlf$logday3
 
+hist.logday1 <- ggplot(dlf, aes(logday1)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(로그 변환) day 1 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$logday1, na.rm = TRUE), 
+                            sd = sd(dlf$logday1, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+hist.logday2 <- ggplot(dlf, aes(logday2)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(로그 변환) day 2 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$logday2, na.rm = TRUE), 
+                            sd = sd(dlf$logday2, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+hist.logday3 <- ggplot(dlf, aes(logday3)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(로그 변환) day 3 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$logday3, na.rm = TRUE), 
+                            sd = sd(dlf$logday3, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
 
 ####
 grid.arrange(hist.day1, hist.logday1, 
@@ -429,8 +547,44 @@ grid.arrange(hist.day1, hist.logday1,
 
 
 ### TODO: 제곱근 변환을 적용하고 sqrtday1, sqrtday2, sqrtday3 3일간 로그 변환된 위생 점수들로 히스토그램을 작성하라.
+dlf$sqrtday1 <- sqrt(dlf$day1)
+dlf$sqrtday1
 
+dlf$sqrtday2 <- sqrt(dlf$day2)
+dlf$sqrtday2
 
+dlf$sqrtday3 <- sqrt(dlf$day3)
+dlf$sqrtday3
+
+hist.sqrtday1 <- ggplot(dlf, aes(sqrtday1)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(제곱근 변환) day 1 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$sqrtday1, na.rm = TRUE), 
+                            sd = sd(dlf$sqrtday1, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+hist.sqrtday2 <- ggplot(dlf, aes(sqrtday2)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(제곱근 변환) day 2 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$sqrtday2, na.rm = TRUE), 
+                            sd = sd(dlf$sqrtday2, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+hist.sqrtday3 <- ggplot(dlf, aes(sqrtday3)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(제곱근 변환) day 3 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$sqrtday3, na.rm = TRUE), 
+                            sd = sd(dlf$sqrtday3, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
 
 ####
 grid.arrange(hist.day1, hist.sqrtday1, 
@@ -444,7 +598,41 @@ dlf$recday1 <- 1/(dlf$day1 + 1)
 dlf$recday1
 
 ### TODO: day2, day3 도 역수변환 recday2, recday3 해보시고 히스토그램을 그려보시오
+dlf$recday2 <- 1/(dlf$day2 + 1)
+dlf$recday2
 
+dlf$recday3 <- 1/(dlf$day3 + 1)
+dlf$recday3
+
+hist.recday1 <- ggplot(dlf, aes(recday1)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(역수 변환) day 1 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$recday1, na.rm = TRUE), 
+                            sd = sd(dlf$recday1, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+hist.recday2 <- ggplot(dlf, aes(recday2)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(역수 변환) day 2 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$recday2, na.rm = TRUE), 
+                            sd = sd(dlf$recday2, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
+
+hist.recday3 <- ggplot(dlf, aes(recday3)) +
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+  labs(x = "(역수 변환) day 3 위생 상태 점수", y = "밀도") + 
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(dlf$recday3, na.rm = TRUE), 
+                            sd = sd(dlf$recday3, na.rm = TRUE)), 
+                colour = "black", 
+                size = 1)
 
 
 ####
@@ -471,12 +659,17 @@ View(fd)
 
 fd[fd$day1 > 4,]
 fd$day1NoOutlier <- ifelse(fd$day1 > 4, NA, fd$day1)
-  
+
 fd[fd$day1NoOutlier > 4,]  
 
 ### TODO: day1 의 이상치(outlier)를 평균에서 표준편차의 3.29배를 더한 값 이상이라고 정의하고 (replaceValue) 그 값보다 클때, 
 ### 이상치를 그 값replaceValue로 대체하라. (fd$day1NoOutlier2)
 
+replaceValue <- mean(fd$day1) + 3.29*sd(fd$day1)
+replaceValue
+fd[fd$day1 > replaceValue, ]
+fd$day1NoOutlier2 <- ifelse(fd$day1 > replaceValue, replaceValue, fd$day1)
+fd[fd$day1NoOutlier2 > replaceValue, ]
 
 
 ### NA value 처리
@@ -510,16 +703,3 @@ dlf$meanHygiene <- ifelse(dlf$daysMissing < 2,
                                    na.rm = TRUE),
                           NA)
 dlf$meanHygiene
-
-
-pnorm(1.64) - pnorm(-1.64)
-pnorm(1.96) - pnorm(-1.96)
-
-qnorm(1-0.01)
-
-1-pt(2.795, 19)
-qt(0.025, 19) 
-qt(1-0.025, 19)
-
-
-
