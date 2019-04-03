@@ -45,7 +45,7 @@ summary(facebookData)
 graph <- ggplot(facebookData, aes(facebookData$NPQC_R_Total, facebookData$Rating))
 
 graph + geom_point()
-graph + geom_point(shape = 17)
+graph + geom_point(shape = 15)
 graph + geom_point(size = 6)
 graph + geom_point(shape = 17, size = 6)
 graph + geom_point(aes(colour = facebookData$Rating_Type))

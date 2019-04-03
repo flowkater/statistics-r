@@ -31,6 +31,7 @@ lines(density(y), lty=2)
 t.test(y)
 t.test(y, alternative = "greater")
 
+
 curve(dnorm(x, 0, sd(y)), -4, 4)
 
 options(digits = 3)

@@ -45,6 +45,8 @@ flip_coin <- function(n) {
   grid.arrange(histogram, lineplot, nrow=2, ncol=1)
 }
 
+flip_coin(3)
+
 flip_coin(10)
 flip_coin(50)
 flip_coin(100)
@@ -62,6 +64,8 @@ sum(x * y) / sum(y)
 27 / 128
 
 ## 조합 구하기
+choose(4, 2) * (1/4)^2 * (3/4)^2
+
 choose(20, 7) # 20 * 19 * 6 * 17 * 2
 
 ## 이항분포 확률 계산하기
@@ -85,6 +89,9 @@ qnorm(0.88)
 
 2.306
 qt(1-0.025, 8) 
+a = 0.025
+df = 8
+qt(1-a, df)
 
-
+c(42 - (2.306 * 2.5), 42 + (2.306 * 2.5))
 
