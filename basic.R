@@ -127,8 +127,10 @@ titanicOlder <- subset(titanic, titanic$Age > 40, select = c("Survived", "Pclass
 
 mean(titanicOlder$Survived)
 
+hist(titanic$Age)
+boxplot(titanic$Age)
 
-
+summary(titanic)
 
 
 

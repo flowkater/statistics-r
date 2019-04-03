@@ -507,3 +507,4 @@ dlf$meanHygiene <- ifelse(dlf$daysMissing < 2,
                                    na.rm = TRUE),
                           NA)
 dlf$meanHygiene
+
