@@ -134,3 +134,4 @@ mean(titanicOlder$Survived)
 
 
 
+
