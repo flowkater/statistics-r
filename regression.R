@@ -26,9 +26,9 @@ library(truncnorm)
 setwd("~/work/statistics-r/")
 
 ## Mac for Korean / Mac 에서 한글 깨질때,
-# Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
-# theme_set(theme_gray(base_family="AppleGothic"))
-# par(family = "AppleGothic")
+Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
+theme_set(theme_gray(base_family="AppleGothic"))
+par(family = "AppleGothic")
 
 spider <- read.csv("./data/spider-gsr.csv", header = TRUE)
 
@@ -146,4 +146,113 @@ pf(F_change(200, 3, 2, 0.6647, 0.330), 2, 196, lower.tail = FALSE)
 
 anova(albumSales.lm2, albumSales.lm3)
 
+# album2
 
+album2$resid <- resid(albumSales.lm3)
+album2$stz.resid <- rstandard(albumSales.lm3)
+album2$stu.resid <- rstudent(albumSales.lm3)
+album2$cooks <- cooks.distance(albumSales.lm3)
+album2$dfbeta <- dfbeta(albumSales.lm3)
+album2$dffit <- dffits(albumSales.lm3)
+album2$leverage <- hatvalues(albumSales.lm3)
+album2$covratios <- covratio(albumSales.lm3)
+
+# head(album2)
+View(album2)
+
+# write.csv(album2, "./data/albumSalesDiagnostics.csv", row.names = F)
+
+album2$stz.resid > 2 |  album2$stz.resid < -2
+
+album2$large.resid <- album2$stz.resid > 2 |  album2$stz.resid < -2
+
+# outlier residual count
+sum(album2$large.resid)
+
+# 164, 169 > 2.5 (within 1%), but 169 over 3 
+album2[album2$large.resid, c("sales", "airplay", "attract", "adverts", "stz.resid")]
+
+# cooks.distance > 1 ?
+# mean of leverage(hat) value = (0.02*(3 + 1)) / 200
+hat <- ((3 + 1)) / 200; hat
+hat * 3
+hat * 2
+album2[album2$large.resid, c("cooks", "leverage", "covratios")]
+
+## covariance ratio, CVR
+durbinWatsonTest(albumSales.lm3)
+# dwt(albumSales.lm3)
+
+vif(albumSales.lm3)
+1/vif(albumSales.lm3)
+mean(vif(albumSales.lm3))
+
+par(mfrow=c(2,2))
+plot(albumSales.lm3)
+
+hist(album2$stu.resid)
+hist(album2$adverts)
+qqnorm(album2$stu.resid); qqline(album2$stu.resid)
+qqnorm(album2$adverts); qqline(album2$adverts)
+
+# Robust Regression, Bootstrapping
+# object <- boot(data, function, repetion)
+bootReg <- function(formula, data, indices){
+  d <- data[indices,]  
+  fit <- lm(formula, data = d)
+  return(coef(fit))
+}
+
+bootResults <- boot(statistic = bootReg, 
+                    formula = sales ~ adverts + airplay + attract,
+                    data = album2, 
+                    R = 2000)
+
+# b0
+boot.ci(bootResults, type = "bca", index = 1) 
+# boot.ci(bootResults, type = "perc", index = 1) 
+# boot.ci(bootResults, type = "norm", index = 1) 
+# boot.ci(bootResults, type = "basic", index = 1)
+
+# b1 adverts
+boot.ci(bootResults, type = "bca", index = 2) 
+
+# b2 airplay
+boot.ci(bootResults, type = "bca", index = 3) 
+
+# b3 attract
+boot.ci(bootResults, type = "bca", index = 4) 
+
+
+######################################################
+### festivalRegData
+
+# ticknumb: 티켓넘버
+# gender: 성별
+# day1: 축제 첫째날 위생(hygiene) 상태
+# day2: 축제 둘째날 위생(hygiene) 상태
+# day3: 축제 셋째날 위생(hygiene) 상태
+## 위생 점수는 0~4
+# change: 첫째날과 셋째날의 차이
+# music: 음악취향
+## - indie kid (얼터너티브 음악) / crusty (힙,포크,앰비언트 장르) / mettaller (헤비메탈 장르) / no musical affiliation (취향 없음)
+
+######################################################
+gfr <- read.csv("./data/GlastonburyFestivalRegression.csv", header = TRUE)
+head(gfr)
+summary(gfr)
+
+contr.treatment(4, base = 4)
+
+contrasts(gfr$music) <- contr.treatment(4, base = 4)
+contrasts(gfr$music)
+
+crusty_v_NMA <- c(1, 0, 0, 0)
+indie_v_NMA <- c(0, 1, 0, 0)
+metal_v_NMA <- c(0, 0, 1, 0)
+
+contrasts(gfr$music) <- cbind(crusty_v_NMA, indie_v_NMA, metal_v_NMA)
+contrasts(gfr$music)
+
+gfr.lm <- lm(change ~ music, data = gfr)
+summary(gfr.lm)
