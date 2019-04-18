@@ -144,6 +144,6 @@ F_change(200, 3, 2, 0.6647, 0.330)
 pf(F_change(200, 3, 2, 0.6647, 0.330), 2, 196, lower.tail = FALSE)
 
 
-
+anova(albumSales.lm2, albumSales.lm3)
 
 
