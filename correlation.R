@@ -65,14 +65,6 @@ grid.arrange(AE.base, AE.group, nrow = 2, ncol = 1)
 
 ## TODO: 복습 시간과 시험 성적에 대한 산점도와 gender에 따른 그룹별 산점도를 그려보시오.
 # RE - Revise, Exam
-RE.base <- ggplot(examData, aes(Revise, Exam)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", colour = "Red", alpha = 0.1, fill = "Blue") + 
-  labs(x = "복습 시간", y = "시험 성적 %")
-RE.group <- ggplot(examData, aes(Revise, Exam, colour = Gender)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", aes(group = examData$Gender), se = F) + 
-  labs(x = "복습 시간", y = "시험 성적 %", colur = examData$Gender)
 
 grid.arrange(RE.base, RE.group, nrow = 2, ncol = 1)
 

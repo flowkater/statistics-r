@@ -102,3 +102,48 @@ albumSales.scatter
 
 ## Todo: albumSales.lm1 에서 나온 Coefficients 들의 t 값과 p-value 를 직접 계산해보아라. (검정 파트 참고)
 
+
+######################################################
+### Album Sales 2.csv
+
+# adverts: 광고 마케팅 비용 
+# sales: 앨범 판매량
+# airplay: 방송 횟수
+# attract: 가수의 매력 (0~10, 최빈값 선택)
+
+######################################################
+
+album2 <- read.csv("./data/Album Sales 2.csv", header = TRUE)
+head(album2)
+summary(album2)
+
+albumSales.lm2 <- lm(sales ~ adverts, data = album2)
+albumSales.lm3 <- lm(sales ~ adverts + airplay + attract, data = album2)
+# albumSales.lm3 <- update(albumSales.lm2, .~. + airplay + attract)
+
+summary(albumSales.lm2)
+summary(albumSales.lm3)
+
+steins_r_squared <- function(n, k, R_2) {
+  return( 1 - (( ((n-1) / (n-k-1)) * ((n-2) / (n-k-2)) * ((n+1) / (n))   )  * (1 - R_2)))
+}
+
+str(album2) # n = 200, k = 3, R^2 = 0.6647
+steins_r_squared(200, 3, 0.6647)
+
+lm.beta(albumSales.lm3)
+confint(albumSales.lm3)
+
+F_change <- function(n, k2, k_change, R2_2, R2_2_change) {
+  return( ( (n - k2 - 1) * R2_2_change ) / ( k_change * (1 - R2_2) )   )
+}
+
+F_change(200, 3, 2, 0.6647, 0.330)
+
+# p-value
+pf(F_change(200, 3, 2, 0.6647, 0.330), 2, 196, lower.tail = FALSE)
+
+
+
+
+
