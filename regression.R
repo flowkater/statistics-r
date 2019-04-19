@@ -38,8 +38,8 @@ spider$predicted <- predict(spider.lm)
 spider$residuals <- residuals(spider.lm)
 
 spider.SST <- ggplot(spider, aes(size, gsr)) + 
-  geom_segment(aes(xend = size, yend = mean(gsr)), alpha = .2) +
-  geom_hline(yintercept = mean(gsr), color = "lightgrey") +
+  geom_segment(aes(xend = size, yend = mean(spider$gsr)), alpha = .2) +
+  geom_hline(yintercept = mean(spider$gsr), color = "lightgrey") +
   geom_point() + 
   labs(x = "거미 크기", y = "불안(GSR)", title = "SST")
 spider.SST
@@ -52,8 +52,8 @@ spider.SSR <- ggplot(spider, aes(size, gsr)) +
 spider.SSR
 
 spider.SSE <- ggplot(spider, aes(size, gsr)) + 
-  geom_segment(aes(y=predicted, xend = size, yend = mean(gsr)), alpha = .2) +
-  geom_hline(yintercept = mean(gsr), color = "lightgrey") +
+  geom_segment(aes(y=predicted, xend = size, yend = mean(spider$gsr)), alpha = .2) +
+  geom_hline(yintercept = mean(spider$gsr), color = "lightgrey") +
   geom_point() + 
   geom_smooth(method = "lm", colour = "lightblue", se = F) + 
   labs(x = "거미 크기", y = "불안(GSR)", title = "SSE/M")
@@ -76,6 +76,30 @@ abline(a=0, b=1, col = 1)
 abline(a=-3, b=3, col = 3)
 abline(a=-3, b=-1, col = 3)
 abline(a=1/2, b=-2, col = 5)
+
+# ourlier residual
+
+spider <- read.csv("./data/spider-gsr.csv", header = TRUE)
+out <- data.frame(24, 7)
+names(out) <- c("size", "gsr")
+
+spiderOut <- rbind(spider, out)
+spiderOut.lm <- lm(gsr ~ size, data = spiderOut)
+
+spiderOut$predicted <- predict(spiderOut.lm)
+spiderOut$residuals <- residuals(spiderOut.lm)
+
+
+
+spiderOut.scatter <- ggplot(spiderOut, aes(size, gsr)) + 
+  geom_segment(aes(xend = size, yend = predicted), alpha = .2) +
+  geom_point() + 
+  geom_smooth(method = "lm", colour = "lightblue", se = F) + 
+  labs(x = "거미 크기", y = "불안(GSR)", title = "SSR")
+spiderOut.scatter
+
+grid.arrange(spider.SSR, 
+             spiderOut.scatter, nrow = 1, ncol = 2)
 
 ######################################################
 ### Album Sales 1.csv
@@ -102,6 +126,10 @@ albumSales.scatter
 
 ## Todo: albumSales.lm1 에서 나온 Coefficients 들의 t 값과 p-value 를 직접 계산해보아라. (검정 파트 참고)
 
+install.packages("scatterplot3d") # Install
+install.packages("rgl")
+library(scatterplot3d)
+library(rgl)
 
 ######################################################
 ### Album Sales 2.csv
@@ -120,6 +148,15 @@ summary(album2)
 albumSales.lm2 <- lm(sales ~ adverts, data = album2)
 albumSales.lm3 <- lm(sales ~ adverts + airplay + attract, data = album2)
 # albumSales.lm3 <- update(albumSales.lm2, .~. + airplay + attract)
+
+
+## 3d scatterplot & regression plane
+s3d <- scatterplot3d(album2[, c("airplay", "adverts", "sales")], angle=55, pch = 16)
+albumSales.lmd <- lm(sales ~ airplay + adverts, data = album2)
+s3d$plane3d(albumSales.lmd)
+
+scatter3d(x = album2$airplay, y = album2$adverts, z = album2$sales)
+
 
 summary(albumSales.lm2)
 summary(albumSales.lm3)
@@ -146,4 +183,29 @@ pf(F_change(200, 3, 2, 0.6647, 0.330), 2, 196, lower.tail = FALSE)
 
 anova(albumSales.lm2, albumSales.lm3)
 
+######################################################
+### pubs.csv
 
+# pubs: 술집 수
+# mortality: 일정 기간의 사망자 수
+
+######################################################
+
+pubs <- read.csv("./data/pubs.csv", header = TRUE)
+head(pubs)
+
+pubsOut <- pubs
+pubs <- pubs[1:7, ]
+
+pubs.lplot <- ggplot(pubs, aes(pubs, mortality)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", colour = "lightblue", se = F) +
+  coord_cartesian(xlim=c(0, 510), ylim=c(0, 10500)) 
+
+pubsOut.lplot <- ggplot(pubsOut, aes(pubs, mortality)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", colour = "lightblue", se = F) +
+  coord_cartesian(xlim=c(0, 510), ylim=c(0, 10500)) 
+
+
+grid.arrange(pubs.lplot, pubsOut.lplot, nrow = 1, ncol = 2)

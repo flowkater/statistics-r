@@ -511,7 +511,6 @@ dlf$meanHygiene <- ifelse(dlf$daysMissing < 2,
                           NA)
 dlf$meanHygiene
 
-
 pnorm(1.64) - pnorm(-1.64)
 pnorm(1.96) - pnorm(-1.96)
 
@@ -520,6 +519,3 @@ qnorm(1-0.01)
 1-pt(2.795, 19)
 qt(0.025, 19) 
 qt(1-0.025, 19)
-
-
-
