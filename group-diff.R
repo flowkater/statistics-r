@@ -88,7 +88,7 @@ head(melted_spiderWideAdj)
 
 spiderWideAdj.bar  <- ggplot(melted_spiderWideAdj, aes(Group, Anxiety)) +
   stat_summary(fun.y = mean, geom = "bar", fill = "white", colour = "Black") +
-  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Red") +
+  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Blue") +
   coord_cartesian(ylim=c(0, 70))
 spiderWideAdj.bar
 

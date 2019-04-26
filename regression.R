@@ -33,6 +33,7 @@ par(family = "AppleGothic")
 spider <- read.csv("./data/spider-gsr.csv", header = TRUE)
 
 spider.lm <- lm(gsr ~ size, data = spider)
+AIC(spider.lm)
 
 spider$predicted <- predict(spider.lm)
 spider$residuals <- residuals(spider.lm)

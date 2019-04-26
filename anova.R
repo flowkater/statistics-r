@@ -13,11 +13,23 @@
 #######################################################
 ####### Section 9. 분산분석(ANOVA) ########
 
+# install.packages("compute.es")
+# install.packages("multcomp")
+# install.packages("pastecs")
+# install.packages("WRS2")
+
 library(ggplot2)
 library(reshape2)
 library(gridExtra)
+library(compute.es)
+library(multcomp)
+library(pastecs)
+library(WRS2)
 
 # setwd("~/work/statistics-R/")
+# Sys.setlocale(category = "LC_CTYPE", locale = "ko_KR.UTF-8")
+# theme_set(theme_gray(base_family="AppleGothic"))
+# par(family = "AppleGothic")
 
 #######################################################
 ### Marketing Revenue.csv
@@ -62,12 +74,12 @@ SSM <- sum((marketing$meanSMS - total_mean)^2) +
   sum((marketing$meanFacebook - total_mean)^2);SSM
 
 ## 그룹과 개인차에 대한 오차제곱합 (관측치 - 각 그룹 평균치)^2
-SSR <- sum((marketing$SMS - meanSMS)^2) +
-  sum((marketing$Push - meanPush)^2) +
-  sum((marketing$Banner - meanBanner)^2) +
-  sum((marketing$Email - meanEmail)^2) +
-  sum((marketing$Blog - meanBlog)^2) +
-  sum((marketing$Facebook - meanFacebook)^2);SSR
+SSR <- sum((marketing$SMS - marketing$meanSMS)^2) +
+  sum((marketing$Push - marketing$meanPush)^2) +
+  sum((marketing$Banner - marketing$meanBanner)^2) +
+  sum((marketing$Email - marketing$meanEmail)^2) +
+  sum((marketing$Blog - marketing$meanBlog)^2) +
+  sum((marketing$Facebook - marketing$meanFacebook)^2);SSR
 
 SST
 SSM + SSR
@@ -115,6 +127,9 @@ grid.arrange(marketing.SST+ theme(legend.position = "none"), marketing.SSR+ them
 k <- length(levels(melted_marketing$channel));k
 n <- length(melted_marketing$id);n
 
+dfm <- k-1
+dfr <- k-1
+
 MSM <- SSM / (k-1);MSM
 MSR <- SSR / (n-k);MSR
 
@@ -149,6 +164,7 @@ F_plot + geom_vline(xintercept = f_value) + geom_vline(xintercept = qf(0.95, k-1
 #######################################################
 
 exam <- read.csv("./data/Exam Score by howto.csv", header = T)
+View(exam)
 str(exam)
 
 # Todo: 데이터의 boxplot 을 그려보시오.
@@ -174,10 +190,151 @@ str(melted_marketing)
 marketing.aov <- aov(count ~ channel, data = melted_marketing)
 summary(marketing.aov)
 
-summary.lm(marketing.aov)
-
 plot(marketing.aov)
+
+# 등분산성이 깨질때, Robust F-statistics 
 
 marketing.oneway <- oneway.test(count ~ channel, data = melted_marketing)
 marketing.oneway
 
+
+# WRS2, Wilcox Robust ANOVA
+t1way(count ~ channel, data = melted_marketing)
+
+med1way(count ~ channel, data = melted_marketing)
+
+t1waybt(count ~ channel, data = melted_marketing)
+
+
+# 계획된 대비 Planned Contrast 
+
+contrast <- read.csv("./data/Contrast.csv", header = T)
+contrast
+
+contrast.lm <- lm(libido ~ dummy1 + dummy2, data = contrast)
+summary(contrast.lm)
+
+contrasts(melted_marketing$channel)
+
+contrast1 <- c(1, 1, -1, -1, -1, 1)
+contrast2 <- c(-1, -1, 0, 0, 0, 2)
+
+
+contrasts(melted_marketing$channel) <- cbind(contrast1, contrast2, 0, 0, 0)
+contrasts(melted_marketing$channel)
+
+marketing.aov <- aov(count ~ channel, data = melted_marketing)
+summary.lm(marketing.aov)
+
+
+contrastBanner <- c(1, 1, -5, 1, 1, 1)
+contrastBlog <- c(1, 1, 0, 1, -4, 1)
+contrastEmail <- c(1, 1, 0, -3, 0, 1)
+contrastSMS <- c(-2, 1, 0, 0, 0, 1)
+contrastPush <- c(0, -1, 0, 0, 0, 1)
+
+contrasts(melted_marketing$channel) <- cbind(contrastBanner, contrastBlog, contrastEmail, contrastSMS, contrastPush)
+contrasts(melted_marketing$channel)
+
+
+marketing.aov <- aov(count ~ channel, data = melted_marketing)
+summary.lm(marketing.aov)
+
+# 대비(contrast) 생성
+contrasts(melted_marketing$channel) <- contr.helmert(6);contrasts(melted_marketing$channel)
+
+marketing.aov <- aov(count ~ channel, data = melted_marketing)
+summary.lm(marketing.aov)
+
+# 추세 분석
+contrasts(melted_marketing$channel) <- contr.poly(6);contrasts(melted_marketing$channel)
+
+marketing.aov <- aov(count ~ channel, data = melted_marketing)
+summary.lm(marketing.aov)
+
+marketing.trend <- ggplot(melted_marketing, aes(channel, count)) + 
+  stat_summary(fun.y = mean, geom = "point") +
+  stat_summary(fun.y = mean, geom = "line", aes(group = 1), colour = "Blue", linetype = "dashed") +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + 
+  labs(x = "Intervention", y = "Mean Number of Hiccups")
+marketing.trend
+
+marketing <- read.csv("./data/Marketing Revenue.csv", header = T)
+melted_marketing <- melt(marketing)
+names(melted_marketing) <- c("channel", "count")
+
+marketing.aov <- aov(count ~ channel, data = melted_marketing)
+summary.lm(marketing.aov)
+
+# 사후 검정(post hoc test)
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "bonferroni")
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "holm")
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "hochberg")
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "hommel")
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "BH")
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "BY")
+pairwise.t.test(melted_marketing$count, melted_marketing$channel, p.adjust.method = "fdr")
+
+# Tukey
+postHocs <- glht(marketing.aov, linfct = mcp(channel = "Tukey"))
+summary(postHocs)
+confint(postHocs)
+
+# Dunnet
+postHocs <- glht(marketing.aov, linfct = mcp(channel = "Dunnet"), base = 1)
+summary(postHocs)
+confint(postHocs)
+
+# Robust 사후 검정
+lincon(count ~ channel, melted_marketing)
+mcppb20(count ~ channel, melted_marketing)
+
+# w^2 (오메가 제곱) 전반적인 효과크기
+w_squared <- function(ssm, sst, dfm, msr) {
+  return((ssm - (dfm*msr)) / (sst + msr))
+}
+
+SSM
+SST
+SSR
+MSR
+dfm
+
+summary.lm(marketing.aov)
+w_squared(SSM, SST, dfm, MSR)
+
+# 그룹들 차이에 대한 효과크기 compute.es
+mean(marketing$Facebook)
+sd(marketing$Facebook)
+length(marketing$Facebook)
+
+mean(marketing$Banner)
+sd(marketing$Banner)
+length(marketing$Banner)
+
+mes(mean(marketing$Facebook), mean(marketing$Banner), sd(marketing$Facebook), sd(marketing$Banner), length(marketing$Facebook), length(marketing$Banner))
+
+# r 대비
+rcontrast <- function(t, df){
+  return(sqrt(t^2 / (t^2 + df)))
+}
+
+contrast1 <- c(1, 1, -1, -1, -1, 1)
+contrast2 <- c(-1, -1, 0, 0, 0, 2)
+
+contrasts(melted_marketing$channel) <- cbind(contrast1, contrast2, 0, 0, 0)
+contrasts(melted_marketing$channel)
+
+marketing.aov <- aov(count ~ channel, data = melted_marketing)
+summary(marketing.aov)
+aovlm <- summary.lm(marketing.aov)
+
+t1 <- aovlm$coefficients[[2,3]];t1
+t2 <- aovlm$coefficients[[3,3]];t2
+
+N <- 72
+p <- 2
+df <- N - p - 1;df
+
+rcontrast(t1, df)
+rcontrast(t2, df)
