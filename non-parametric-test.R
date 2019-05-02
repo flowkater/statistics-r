@@ -14,11 +14,17 @@
 ####### Section 10. 비모수적 검정 ########
 
 # install.packages("clinfun")
+# install.packages("pgirmess")
+# install.packages("car")
+# install.packages("ggplot2")
+# install.packages("pastecs")
+# install.packages("reshape2")
 
 library(clinfun)
 library(car)
 library(ggplot2)
 library(pastecs)
+library(pgirmess)
 library(reshape2)
 
 setwd("~/work/statistics-R/")
@@ -131,5 +137,5 @@ by(marketingData$Ranks, marketingData$channel, mean)
 ## - ANOVA 처럼 그룹들간의 차이가 유의하다만 알 수 있다.
 ## - Boxplot 및 평균 순위를 이용하여 차이를 설명할 수 있다.
 
-
-
+# 크루스컬 사후 검정
+kruskalmc(count~channel, data = marketingData)
