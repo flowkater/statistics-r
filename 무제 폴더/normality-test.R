@@ -32,7 +32,7 @@ library(SuppDists)
 # theme_set(theme_gray(base_family="AppleGothic"))
 # par(family = "AppleGothic")
 # 
-# setwd("~/oldwork/statistics-R/")
+# setwd("~/work/statistics-R/")
 
 ######################################################
 ### festivalDataNoOutlier(이상치 제거 버전)

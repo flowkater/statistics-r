@@ -38,8 +38,10 @@ library(MASS)
 
 catsData <- read.csv("./data/cats.csv", header = T)
 head(catsData)
+View(catsData)
 
 catsTable <- table(catsData);catsTable
+prop.table(catsTable)
 
 CrossTable(catsData$Training, catsData$Dance, fisher = T, chisq = T, expected = T, sresid = T, format="SPSS")
 
@@ -99,7 +101,7 @@ plot(density(train$Age))
 # 여자와 아이를 위주로 구했다던데?
 table(train$Sex, train$Survived)
 prop.table(table(train$Sex, train$Survived)) # 2x2 행렬 총합을 기준으로 확률 계산
-prop.table(table(train$Sex, train$Survived),1) # 1x2 행렬 합을 기준으로 확률 계산
+prop.table(table(train$Sex, train$Survived), 1) # 1x2 행렬 합을 기준으로 확률 계산
 
 # 어린아이도 많이 생존했는지 확인하기 위해서 새 항목 개설
 train$Child <- 0
@@ -156,6 +158,7 @@ test$Fare2[test$Fare < 10] <- '<10'
 
 # Logit predict
 fitted.results <- predict(model, newdata = subset(test, select = c('Child', 'Sex', 'Pclass', 'Fare2', 'Embarked')), type = 'response')
+fitted.results
 fitted.results <- ifelse(fitted.results > 0.5,1,0)
 
 test$Survived <- 0

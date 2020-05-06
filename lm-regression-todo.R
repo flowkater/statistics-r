@@ -126,10 +126,17 @@ cor(album1$sales, album1$adverts)^2
 albumSales.scatter <- ggplot(album1, aes(adverts, sales)) + 
   geom_point() + 
   geom_smooth(method = "lm", colour = "Blue", se = F) + 
-  labs(x = "광고 마케팅 비용", y = "앨범 판매량")
+  labs(x = "광고 마케팅 비용", y = "판매량")
 albumSales.scatter
 
 ## Todo: albumSales.lm1 에서 나온 Coefficients 들의 t 값과 p-value 를 직접 계산해보아라. (검정 파트 참고)
+
+9.612e-02
+1.341e+02
+
+x = 1000
+
+0.09612 * x + 134.1
 
 
 ######################################################
@@ -154,6 +161,8 @@ heights.lplot
 
 heights$stz_father <- (heights$father - mean(heights$father)) / sd(heights$father)
 heights$stz_son <- (heights$son - mean(heights$son)) / sd(heights$son)
+
+View(heights)
 
 heights.stz_plot <- ggplot(heights, aes(stz_father, stz_son)) + 
   geom_point() + 
@@ -193,218 +202,7 @@ round(sd(heights$father),2)
 round(sd(heights$son),2)
 
 
-######################################################
 
-install.packages("scatterplot3d") # Install
-install.packages("rgl")
-library(scatterplot3d)
-library(rgl)
-
-######################################################
-### pubs.csv
-
-# pubs: 술집 수
-# mortality: 일정 기간의 사망자 수
-
-######################################################
-
-pubs <- read.csv("./data/pubs.csv", header = TRUE)
-head(pubs)
-
-pubsOut <- pubs
-pubs <- pubs[1:7, ]
-
-pubs.lplot <- ggplot(pubs, aes(pubs, mortality)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", colour = "lightblue", se = F) +
-  coord_cartesian(xlim=c(0, 510), ylim=c(0, 10500)) 
-
-pubsOut.lplot <- ggplot(pubsOut, aes(pubs, mortality)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", colour = "lightblue", se = F) +
-  coord_cartesian(xlim=c(0, 510), ylim=c(0, 10500)) 
+####
 
 
-grid.arrange(pubs.lplot, pubsOut.lplot, nrow = 1, ncol = 2)
-
-pubsOut.lm <- lm(mortality ~ pubs, data = pubsOut)
-summary(pubsOut.lm)
-
-pubsOut$resid <- round(resid(pubsOut.lm), 2)
-pubsOut$cooks <- round(cooks.distance(pubsOut.lm), 2)
-pubsOut$leverage <- round(hatvalues(pubsOut.lm), 2)
-pubsOut$dfbeta <- round(dfbeta(pubsOut.lm), 2)
-
-View(pubsOut)
-
-
-######################################################
-### Album Sales 2.csv
-
-# adverts: 광고 마케팅 비용 
-# sales: 앨범 판매량
-# airplay: 방송 횟수
-# attract: 가수의 매력 (0~10, 최빈값 선택)
-
-######################################################
-
-album2 <- read.csv("./data/Album Sales 2.csv", header = TRUE)
-head(album2)
-summary(album2)
-
-albumSales.lm2 <- lm(sales ~ adverts, data = album2)
-albumSales.lm3 <- lm(sales ~ adverts + airplay + attract, data = album2)
-# albumSales.lm3 <- update(albumSales.lm2, .~. + airplay + attract)
-
-
-## 3d scatterplot & regression plane
-s3d <- scatterplot3d(album2[, c("airplay", "adverts", "sales")], angle=55, pch = 16)
-albumSales.lmd <- lm(sales ~ airplay + adverts, data = album2)
-s3d$plane3d(albumSales.lmd)
-
-scatter3d(x = album2$airplay, y = album2$adverts, z = album2$sales)
-
-summary(albumSales.lm2)
-summary(albumSales.lm3)
-
-steins_r_squared <- function(n, k, R_2) {
-  return( 1 - (( ((n-1) / (n-k-1)) * ((n-2) / (n-k-2)) * ((n+1) / (n))   )  * (1 - R_2)))
-}
-
-str(album2) # n = 200, k = 3, R^2 = 0.6647
-steins_r_squared(200, 3, 0.6647)
-
-lm.beta(albumSales.lm3)
-confint(albumSales.lm3)
-
-F_change <- function(n, k2, k_change, R2_2, R2_2_change) {
-  return( ( (n - k2 - 1) * R2_2_change ) / ( k_change * (1 - R2_2) )   )
-}
-
-F_change(200, 3, 2, 0.6647, 0.330)
-
-# p-value
-pf(F_change(200, 3, 2, 0.6647, 0.330), 2, 196, lower.tail = FALSE)
-
-
-anova(albumSales.lm2, albumSales.lm3)
-
-album2$resid <- resid(albumSales.lm3)
-album2$stz.resid <- rstandard(albumSales.lm3)
-album2$stu.resid <- rstudent(albumSales.lm3)
-album2$cooks <- cooks.distance(albumSales.lm3)
-album2$dfbeta <- dfbeta(albumSales.lm3)
-album2$dffit <- dffits(albumSales.lm3)
-album2$leverage <- hatvalues(albumSales.lm3)
-album2$covratios <- covratio(albumSales.lm3)
-
-# head(album2)
-View(album2)
-
-# write.csv(album2, "./data/albumSalesDiagnostics.csv", row.names = F)
-
-album2$stz.resid > 2 |  album2$stz.resid < -2
-
-album2$large.resid <- album2$stz.resid > 2 |  album2$stz.resid < -2
-
-# outlier residual count
-sum(album2$large.resid)
-
-# 164, 169 > 2.5 (within 1%), but 169 over 3 
-album2[album2$large.resid, c("sales", "airplay", "attract", "adverts", "stz.resid")]
-
-# cooks.distance > 1 ?
-# mean of leverage(hat) value = (0.02*(3 + 1)) / 200
-hat <- ((3 + 1)) / 200; hat
-hat * 3
-hat * 2
-album2[album2$large.resid, c("cooks", "leverage", "covratios")]
-
-## covariance ratio, CVR
-durbinWatsonTest(albumSales.lm3)
-# dwt(albumSales.lm3)
-
-vif(albumSales.lm3)
-1/vif(albumSales.lm3)
-mean(vif(albumSales.lm3))
-
-par(mfrow=c(2,2))
-plot(albumSales.lm3)
-
-hist(album2$stu.resid)
-hist(album2$adverts)
-qqnorm(album2$stu.resid); qqline(album2$stu.resid)
-qqnorm(album2$adverts); qqline(album2$adverts)
-
-# Robust Regression, Bootstrapping
-# object <- boot(data, function, repetion)
-bootReg <- function(formula, data, indices){
-  d <- data[indices,]  
-  fit <- lm(formula, data = d)
-  return(coef(fit))
-}
-
-bootResults <- boot(statistic = bootReg, 
-                    formula = sales ~ adverts + airplay + attract,
-                    data = album2, 
-                    R = 2000)
-
-# b0
-boot.ci(bootResults, type = "bca", index = 1) 
-# boot.ci(bootResults, type = "perc", index = 1) 
-# boot.ci(bootResults, type = "norm", index = 1) 
-# boot.ci(bootResults, type = "basic", index = 1)
-
-# b1 adverts
-boot.ci(bootResults, type = "bca", index = 2) 
-
-# b2 airplay
-boot.ci(bootResults, type = "bca", index = 3) 
-
-# b3 attract
-boot.ci(bootResults, type = "bca", index = 4) 
-
-
-######################################################
-### festivalRegData
-
-# ticknumb: 티켓넘버
-# gender: 성별
-# day1: 축제 첫째날 위생(hygiene) 상태
-# day2: 축제 둘째날 위생(hygiene) 상태
-# day3: 축제 셋째날 위생(hygiene) 상태
-## 위생 점수는 0~4
-# change: 첫째날과 셋째날의 차이
-# music: 음악취향
-## - indie kid (얼터너티브 음악) / crusty (힙,포크,앰비언트 장르) / mettaller (헤비메탈 장르) / no musical affiliation (취향 없음)
-
-######################################################
-gfr <- read.csv("./data/GlastonburyFestivalRegression.csv", header = TRUE)
-head(gfr)
-summary(gfr)
-
-contr.treatment(4, base = 4)
-
-contrasts(gfr$music) <- contr.treatment(4, base = 4)
-contrasts(gfr$music)
-
-crusty_v_NMA <- c(1, 0, 0, 0)
-indie_v_NMA <- c(0, 1, 0, 0)
-metal_v_NMA <- c(0, 0, 1, 0)
-
-contrasts(gfr$music) <- cbind(crusty_v_NMA, indie_v_NMA, metal_v_NMA)
-contrasts(gfr$music)
-
-gfr.lm <- lm(change ~ music, data = gfr)
-summary(gfr.lm)
-
-round(tapply(gfr$change, gfr$music, mean, na.rm = T), 3)
-
-###### 회귀 샘플사이즈
-sampleSize <- read.csv("./data/cohen-effect-sample-size.csv", header = TRUE)
-head(sampleSize)
-
-sampleSize.lplot <- ggplot(sampleSize, aes(Npredictors, SampleSize, colour = EffectSize)) +
-  geom_line() +
-  geom_point()
-sampleSize.lplot

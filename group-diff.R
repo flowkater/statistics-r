@@ -20,7 +20,7 @@ library(gridExtra)
 library(pastecs)
 library(WRS2)
 
-setwd("~/work/statistics-R/")
+setwd("~/oldwork/statistics-R/")
 
 #######################################################
 ### SpiderLong.csv
@@ -34,12 +34,22 @@ spiderLong <- read.csv("./data/SpiderLong.csv", header = T)
 str(spiderLong)
 summary(spiderLong)
 head(spiderLong)
+View(spiderLong)
 
 spiderLong.bar <- ggplot(spiderLong, aes(Group, Anxiety)) +
   stat_summary(fun.y = mean, geom = "bar", fill = "white", colour = "Black") +
   stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Red") +
   coord_cartesian(ylim=c(0, 70))
 spiderLong.bar
+
+spiderLong.boxplot <- ggplot(spiderLong, aes(Group, Anxiety)) +
+  geom_boxplot() +
+  coord_cartesian(ylim=c(0, 70))
+spiderLong.boxplot
+
+grid.arrange(spiderLong.bar, spiderLong.boxplot, nrow = 1, ncol = 2)
+
+by(spiderLong$Anxiety, spiderLong$Group, stat.desc, basic = F, norm = T)
 
 #######################################################
 ### SpiderWide.csv
@@ -50,73 +60,14 @@ spiderLong.bar
 #######################################################
 
 spiderWide <- read.csv("./data/SpiderWide.csv", header = T)
-str(spiderWider)
-summary(spiderWider)
-
-melted_spiderWide <- melt(spiderWide)
-names(melted_spiderWide) <- c("Group", "Anxiety")
-head(melted_spiderWide)
-
-
-spiderWide.bar  <- ggplot(melted_spiderWide, aes(Group, Anxiety)) +
-  stat_summary(fun.y = mean, geom = "bar", fill = "white", colour = "Black") +
-  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Red") + 
-  coord_cartesian(ylim=c(0, 70))
-spiderWide.bar
-
-grid.arrange(spiderLong.bar, spiderWide.bar, nrow=1, ncol=2)
-
-## problem spiderWide
-spiderWide$pMean <- (spiderWide$picture + spiderWide$real) / 2;spiderWide$pMean
-grandMean <- mean(c(spiderWide$picture, spiderWide$real));grandMean
-
-spiderWide$adj <- grandMean - spiderWide$pMean;spiderWide$adj
-
-spiderWide$picture_adj <- spiderWide$picture + spiderWide$adj
-spiderWide$real_adj <- spiderWide$real + spiderWide$adj
-spiderWide$pMean2 <- (spiderWide$picture_adj + spiderWide$real_adj) / 2;spiderWide$pMean2
-head(spiderWide)
-
-spiderWide
-
-spiderWideAdj <- spiderWide[, c("picture_adj", "real_adj")]
-head(spiderWideAdj)
-
-melted_spiderWideAdj <- melt(spiderWideAdj)
-names(melted_spiderWideAdj) <- c("Group", "Anxiety")
-head(melted_spiderWideAdj)
-
-spiderWideAdj.bar  <- ggplot(melted_spiderWideAdj, aes(Group, Anxiety)) +
-  stat_summary(fun.y = mean, geom = "bar", fill = "white", colour = "Black") +
-  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Blue") +
-  coord_cartesian(ylim=c(0, 70))
-spiderWideAdj.bar
-
-grid.arrange(spiderLong.bar, spiderWideAdj.bar, nrow=1, ncol=2)
-
-
+str(spiderWide)
+summary(spiderWide)
+View(spiderWide)
 
 #######################################################
 ### Independent t test
 
 #######################################################
-
-spiderWide <- read.csv("./data/SpiderWide.csv", header = T)
-spiderLong <- read.csv("./data/spiderLong.csv", header = T)
-
-head(spiderLong)
-
-spiderLong.bar
-
-spiderLong.boxplot <- ggplot(spiderLong, aes(Group, Anxiety)) +
-  geom_boxplot() +
-  coord_cartesian(ylim=c(0, 70))
-spiderLong.boxplot
-
-grid.arrange(spiderLong.bar, spiderLong.boxplot, nrow = 1, ncol = 2)
-
-by(spiderLong$Anxiety, spider$Group, stat.desc, basic = F, norm = T)
-
 ind.t.test <- t.test(Anxiety ~ Group, data = spiderLong)
 ind.t.test
 
@@ -155,7 +106,7 @@ summary(spiderWide)
 
 stat.desc(spiderWide, basic = F, norm = T)
 
-## TODO: spiderWide 데이터의 정규성 가정을 점검하라.
+## TODO: spiderWide 데이터의 정규성 가정을 점검하라. (첨도, 왜도, 히스토그램 등으로 시각화)
 
 
 dep.t.test <- t.test(spiderWide$real, spiderWide$picture, paired = T)
@@ -171,3 +122,51 @@ df <- dep.t.test$parameter[[1]]; df
 r <- sqrt(t^2 / (t^2 + df));r
 round(r, 3)
 
+
+######## 반복측정 설계시 오차막대 그래프의 문제 #########
+
+melted_spiderWide <- melt(spiderWide)
+names(melted_spiderWide) <- c("Group", "Anxiety")
+head(melted_spiderWide)
+
+
+spiderWide.bar  <- ggplot(melted_spiderWide, aes(Group, Anxiety)) +
+  stat_summary(fun.y = mean, geom = "bar", fill = "white", colour = "Black") +
+  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Red") + 
+  coord_cartesian(ylim=c(0, 70))
+spiderWide.bar
+
+grid.arrange(spiderLong.bar, spiderWide.bar, nrow=1, ncol=2)
+
+## problem spiderWide
+# 각 개인의 picture + real 의 평균값 계산
+spiderWide$pMean <- (spiderWide$picture + spiderWide$real) / 2;spiderWide$pMean
+
+# 모든 자료의 평균값 계산
+grandMean <- mean(c(spiderWide$picture, spiderWide$real));grandMean
+
+# 모든 자료의 평균값 - 각 개인의 평균값 = 조정 인자 (설명되지 않는 변동, 개인차)
+spiderWide$adj <- grandMean - spiderWide$pMean;spiderWide$adj
+
+# 각 관측치 + 조정인자
+spiderWide$picture_adj <- spiderWide$picture + spiderWide$adj
+spiderWide$real_adj <- spiderWide$real + spiderWide$adj
+spiderWide$pMean2 <- (spiderWide$picture_adj + spiderWide$real_adj) / 2;spiderWide$pMean2
+head(spiderWide)
+
+View(spiderWide)
+
+spiderWideAdj <- spiderWide[, c("picture_adj", "real_adj")]
+head(spiderWideAdj)
+
+melted_spiderWideAdj <- melt(spiderWideAdj)
+names(melted_spiderWideAdj) <- c("Group", "Anxiety")
+head(melted_spiderWideAdj)
+
+spiderWideAdj.bar  <- ggplot(melted_spiderWideAdj, aes(Group, Anxiety)) +
+  stat_summary(fun.y = mean, geom = "bar", fill = "white", colour = "Black") +
+  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", colour = "Blue") +
+  coord_cartesian(ylim=c(0, 70))
+spiderWideAdj.bar
+
+grid.arrange(spiderLong.bar, spiderWideAdj.bar, nrow=1, ncol=2)

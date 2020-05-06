@@ -17,12 +17,16 @@
 #######################################################
 ####### Section 2. ggplot2 시각화 예제 따라쳐보기 ########
 
+install.packages("extrafont")
+install.packages("reshape")
+install.packages("Hmisc")
+
 library(ggplot2)
 library(extrafont)
 library(reshape)
 library(Hmisc)
 
-setwd("~/work/statistics-R/")
+setwd("~/oldwork/statistics-R/")
 
 ######################################################
 ### facebookData.csv
@@ -162,6 +166,8 @@ bar + stat_summary(fun.y = mean, geom = "bar", position = "dodge") +
   stat_summary(fun.data = mean_cl_normal, geom = "errorbar", position = position_dodge(width = 0.90), width = 0.2) +
   labs(x = "Film", y = "Mean Arousal", fill = "Gender") # +
   # scale_fill_manual("Gender", values = c("Female" = "#3366FF", "Male" = "#336633"))
+
+
 
 bar <- ggplot(chickFlick, aes(chickFlick$film, chickFlick$arousal, fill = chickFlick$film))
 bar + stat_summary(fun.y = mean, geom = "bar") +

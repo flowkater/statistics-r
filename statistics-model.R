@@ -28,7 +28,7 @@ library(ggplot2)
 library(gridExtra)
 library(truncnorm)
 
-setwd("~/work/statistics-R/")
+# setwd("~/oldwork/statistics-R/")
 
 ### 도수 분포 (frequency distribution; 빈도 분포) / 히스토그램(histogram)
 StudyTime <- read.csv("./data/study_time.csv", header = TRUE)

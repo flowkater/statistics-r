@@ -70,14 +70,7 @@ grid.arrange(RE.base, RE.group, nrow = 2, ncol = 1)
 ## TODO: 복습 시간과 시험 불안도에 대한 산점도와 gender에 따른 그룹별 산점도를 그려보시오.
 
 # RA - Revise, Anxiety
-RA.base <- ggplot(examData, aes(Revise, Anxiety)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", colour = "Red", alpha = 0.1, fill = "Blue") + 
-  labs(x = "복습 시간", y = "시험 불안")
-RA.group <- ggplot(examData, aes(Revise, Anxiety, colour = Gender)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", aes(group = examData$Gender), se = F) + 
-  labs(x = "복습 시간", y = "시험 불안", colur = examData$Gender)
+
 
 grid.arrange(RA.base, RA.group, nrow = 2, ncol = 1)
 
@@ -146,18 +139,11 @@ liarData <- read.csv("./data/The Biggest Liar.csv", header = TRUE)
 View(liarData)
 str(liarData)
 
-## TODO: Position 변수와 Creativity 변수의 스피어먼 상관계수를 계산해보라.
+## TODO: Position 변수와 Creativity 변수의 스피어먼 로 상관계수를 계산해보라. cor, cor.test 사용
 
-cor(liarData$Position, liarData$Creativity, method = "spearman")
 
-liarMatrix <- as.matrix(liarData[, c("Position", "Creativity")])
-Hmisc::rcorr(liarMatrix)
+## TODO: Position 변수와 Creativity 변수의 켄달의 타우 상관계수를 계산해보라. cor, cor.test 사용
 
-cor.test(liarData$Position, liarData$Creativity, alternative = "less", method = "spearman")
-
-## kendall's tau
-cor(liarData$Position, liarData$Creativity, method = "kendall")
-cor.test(liarData$Position, liarData$Creativity, alternative = "less", method = "kendall")
 
 
 
@@ -278,7 +264,7 @@ heatmap.lower_tri <- ggplot(melted_cormat, aes(Var1,Var2, fill=value)) +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                        midpoint = 0, limit = c(-1, 1), space = "Lab", name="Pearson\nCorrelation") +
   theme_minimal()
-  
+
 heatmap.lower_tri
 
 
@@ -288,7 +274,7 @@ heatmap.text <- ggplot(melted_cormat, aes(Var1,Var2, fill=value)) +
                        midpoint = 0, limit = c(-1, 1), space = "Lab", name="Pearson\nCorrelation") +
   theme_minimal() + 
   geom_text(aes(Var1,Var2, label=value), colour = "black",size = 4)
-  
+
 heatmap.text
 
 ## R 내장 mtcars 데이터
@@ -309,11 +295,10 @@ heatmap.mycars
 
 ## 독립적인 r들의 비교 
 ## TODO: subset() 함수를 이용해서 examData 를 남성과 여성의 시험불안과 시험 성적 사이의 상관계수들을 구하라.
-mexamData <- subset(examData[, c("Exam", "Anxiety", "Revise","Gender")], examData$Gender == "Male")
-str(mexamData)
-fexamData <- subset(examData[, c("Exam", "Anxiety", "Revise","Gender")], examData$Gender == "Female")
-str(fexamData)
 
+
+
+##
 r1 <- cor(mexamData$Exam, mexamData$Anxiety); r1
 r2 <- cor(fexamData$Exam, fexamData$Anxiety); r2
 
